@@ -4,15 +4,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>One-second observation test</title>
+  <title>One-second observation test (v2)</title>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: "Microsoft JhengHei", sans-serif;
       background-color: #f0f0f5;
@@ -23,277 +18,65 @@
       min-height: 100vh;
       padding: 20px;
     }
-
-    h1 {
-      margin-bottom: 20px;
-      font-size: 2.2rem;
-      text-align: center;
-      color: #2c3e50;
-    }
-
+    h1 { margin-bottom: 20px; font-size: 2.2rem; text-align: center; color: #2c3e50; }
     button {
-      cursor: pointer;
-      border: none;
-      border-radius: 8px;
-      padding: 12px 24px;
-      font-size: 1rem;
-      transition: background-color 0.2s, transform 0.1s;
-      background-color: #2980b9;
-      color: #fff;
+      cursor: pointer; border: none; border-radius: 8px; padding: 12px 24px;
+      font-size: 1rem; transition: background-color 0.2s, transform 0.1s;
+      background-color: #2980b9; color: #fff;
     }
-
-    button:hover {
-      transform: translateY(-2px);
-      background-color: #1c5980;
-    }
-
-    button:active {
-      transform: translateY(0);
-    }
-
-    button:disabled {
-      background-color: #aaa;
-      cursor: not-allowed;
-      opacity: 0.7;
-    }
+    button:hover { transform: translateY(-2px); background-color: #1c5980; }
+    button:active { transform: translateY(0); }
+    button:disabled { background-color: #aaa; cursor: not-allowed; opacity: 0.7; }
 
     /* Container Layout */
-    #home {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 100%;
-      max-width: 640px;
-      gap: 16px;
-    }
+    #home { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 640px; gap: 16px; }
+    #home .slider-container { display:flex; align-items:center; width:100%; }
+    #home .slider-label { flex: 0 0 60px; font-size: 1rem; }
+    #home input[type="range"] { flex: 1; margin: 0 10px; }
+    #home .slider-value { width: 32px; text-align: center; font-weight: bold; }
 
-    #home .slider-container {
-      display: flex;
-      align-items: center;
-      width: 100%;
-    }
-
-    #home .slider-label {
-      flex: 0 0 60px;
-      font-size: 1rem;
-    }
-
-    #home input[type="range"] {
-      flex: 1;
-      margin: 0 10px;
-    }
-
-    #home .slider-value {
-      width: 32px;
-      text-align: center;
-      font-weight: bold;
-    }
-
-    #home .mode-buttons {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      width: 100%;
-    }
-
-    #home .mode-buttons button {
-      background-color: #2980b9;
-      color: #fff;
-      font-size: 1.1rem;
-      padding: 15px 10px;
-    }
-
-    #home .mode-buttons button:hover {
-      background-color: #1c5980;
-    }
+    #home .mode-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
+    #home .mode-buttons button { background-color: #2980b9; color: #fff; font-size: 1.1rem; padding: 15px 10px; }
+    #home .mode-buttons button:hover { background-color: #1c5980; }
 
     /* Quiz Container */
-    #quiz-container {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      width: 100%;
-      max-width: 640px;
-    }
+    #quiz-container { display: none; flex-direction: column; align-items: center; width: 100%; max-width: 640px; }
+    #board-wrapper { position: relative; width: 100%; padding-top: 100%; }
+    #board { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 2px solid #2c3e50; background-color: #e0c78d; touch-action: none; }
 
-    #board-wrapper {
-      position: relative;
-      width: 100%;
-      padding-top: 100%;
-      /* 正方形比例 */
-    }
+    #feedback { font-size: 1.1rem; margin: 16px 0; color: #2c3e50; min-height: 1.5em; text-align: center; font-weight: bold; }
+    #choices { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:16px; width:100%; }
 
-    #board {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border: 2px solid #2c3e50;
-      background-color: #e0c78d;
-      touch-action: none;
-    }
+    .choice-btn { flex: 1 1 calc(25% - 10px); min-width: 50px; background-color: #27ae60; color:#fff; min-height:60px; display:flex; align-items:center; justify-content:center; font-size:1.3rem; font-weight:bold; border-radius:8px; }
+    .choice-btn:hover { background-color:#1e8449; }
+    .choice-btn.correct { background-color:#27ae60; animation:pulse 0.5s; }
+    .choice-btn.incorrect { background-color:#e74c3c; }
 
-    #feedback {
-      font-size: 1.1rem;
-      margin: 16px 0;
-      color: #2c3e50;
-      min-height: 1.5em;
-      text-align: center;
-      font-weight: bold;
-    }
-
-    #choices {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 16px;
-      width: 100%;
-    }
-
-    .choice-btn {
-      flex: 1 1 calc(25% - 10px);
-      min-width: 50px;
-      background-color: #27ae60;
-      color: #fff;
-      min-height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.3rem;
-      font-weight: bold;
-      border-radius: 8px;
-    }
-
-    .choice-btn:hover {
-      background-color: #1e8449;
-    }
-
-    .choice-btn.correct {
-      background-color: #27ae60;
-      animation: pulse 0.5s;
-    }
-
-    .choice-btn.incorrect {
-      background-color: #e74c3c;
-    }
-
-    @keyframes pulse {
-      0% {
-        transform: scale(1);
-      }
-
-      50% {
-        transform: scale(1.1);
-      }
-
-      100% {
-        transform: scale(1);
-      }
-    }
+    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
     /* Summary */
-    #summary {
-      display: none;
-      width: 100%;
-      max-width: 640px;
-      text-align: center;
-      margin-top: 20px;
-    }
+    #summary { display:none; width:100%; max-width:640px; text-align:center; margin-top:20px; }
+    #summary h2 { font-size:1.8rem; color:#2c3e50; margin-bottom:12px; }
+    #summary h3 { font-family:"Arial Black", Gadget, sans-serif; color:#e67e22; font-size:2.5rem; margin:16px 0; }
 
-    #summary h2 {
-      font-size: 1.8rem;
-      color: #2c3e50;
-      margin-bottom: 12px;
-    }
+    #score-table { width:100%; border-collapse:collapse; margin-top:12px; font-size:0.95rem; }
+    #score-table th, #score-table td { border:1px solid #666; padding:8px; }
+    #score-table th { background-color:#bdc3c7; }
+    #score-table tr:nth-child(even){ background-color:#f2f2f2; }
+    #score-table tr.correct-row { background-color:#d4edda; }
+    #score-table tr.incorrect-row { background-color:#f8d7da; }
 
-    /* 特殊樣式：最終分數 */
-    #summary h3 {
-      font-family: "Arial Black", Gadget, sans-serif;
-      color: #e67e22;
-      font-size: 2.5rem;
-      margin: 16px 0;
-    }
+    #restart, #screenshot { margin-top:20px; background-color:#c0392b; color:#fff; font-size:1rem; padding:12px 24px; }
+    #restart:hover, #screenshot:hover { background-color:#922b21; }
 
-    #score-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 12px;
-      font-size: 0.95rem;
-    }
+    #timer { position:absolute; top:10px; right:10px; background: rgba(0,0,0,0.7); color:white; padding:5px 10px; border-radius:5px; font-size:1.2rem; display:none; }
 
-    #score-table th,
-    #score-table td {
-      border: 1px solid #666;
-      padding: 8px;
-    }
-
-    #score-table th {
-      background-color: #bdc3c7;
-    }
-
-    #score-table tr:nth-child(even) {
-      background-color: #f2f2f2;
-    }
-
-    #score-table tr.correct-row {
-      background-color: #d4edda;
-    }
-
-    #score-table tr.incorrect-row {
-      background-color: #f8d7da;
-    }
-
-    /* 重新開始與截圖按鈕 */
-    #restart,
-    #screenshot {
-      margin-top: 20px;
-      background-color: #c0392b;
-      color: #fff;
-      font-size: 1rem;
-      padding: 12px 24px;
-    }
-
-    #restart:hover,
-    #screenshot:hover {
-      background-color: #922b21;
-    }
-
-    #timer {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: rgba(0, 0, 0, 0.7);
-      color: white;
-      padding: 5px 10px;
-      border-radius: 5px;
-      font-size: 1.2rem;
-      display: none;
-    }
-
-    @media (max-width: 600px) {
-      h1 {
-        font-size: 1.8rem;
-      }
-
-      .choice-btn {
-        flex: 1 1 calc(33% - 10px);
-        min-height: 50px;
-        font-size: 1.2rem;
-      }
-
-      #home .mode-buttons {
-        grid-template-columns: 1fr;
-      }
-
-      #score-table {
-        font-size: 0.85rem;
-      }
-
-      #summary h3 {
-        font-size: 2rem;
-      }
+    @media (max-width:600px) {
+      h1 { font-size:1.8rem; }
+      .choice-btn { flex: 1 1 calc(33% - 10px); min-height:50px; font-size:1.2rem; }
+      #home .mode-buttons { grid-template-columns: 1fr; }
+      #score-table { font-size:0.85rem; }
+      #summary h3 { font-size:2rem; }
     }
   </style>
 </head>
@@ -309,7 +92,7 @@
       <span id="sliderValue" class="slider-value">1</span>
     </div>
 
-    <!-- 限時選擇（新增） -->
+    <!-- 限時選擇 -->
     <div class="slider-container">
       <span class="slider-label">限時：</span>
       <input id="timeSlider" type="range" min="1" max="10" value="1" />
@@ -322,6 +105,7 @@
       <button data-mode="edge">測試模式‧邊上</button>
       <button data-mode="center">測試模式‧中央</button>
       <button data-mode="ladder">天梯模式</button>
+      <button data-mode="irregular">不規則天梯</button>
     </div>
   </div>
 
@@ -337,6 +121,7 @@
   <div id="summary">
     <h2>測驗結束！</h2>
     <div id="score-overview"></div>
+    <div id="score-formula" style="text-align:left; margin-top:10px; font-family:monospace; white-space:pre-wrap;"></div>
     <table id="score-table">
       <thead>
         <tr>
@@ -357,8 +142,8 @@
     const homeDiv = document.getElementById("home");
     const difficultySl = document.getElementById("difficultySlider");
     const sliderValueSp = document.getElementById("sliderValue");
-    const timeSl = document.getElementById("timeSlider");       // 新增
-    const timeValueSp = document.getElementById("timeValue");   // 新增
+    const timeSl = document.getElementById("timeSlider");
+    const timeValueSp = document.getElementById("timeValue");
 
     const quizDiv = document.getElementById("quiz-container");
     const canvas = document.getElementById("board");
@@ -371,10 +156,11 @@
     const restartBtn = document.getElementById("restart");
     const screenshotBtn = document.getElementById("screenshot");
     const timerDiv = document.getElementById("timer");
+    const scoreFormulaDiv = document.getElementById("score-formula");
 
     let mode = null;
     let difficulty = 1;
-    let timeLimit = 1;   // 新增：預設限時為 1 秒
+    let timeLimit = 1;
     let questionCount = 0;
     let mistakeCount = 0;
     let history = [];
@@ -384,40 +170,30 @@
     let prevCorrectNumber = null;
     let prevWasCorrect = null;
 
+    let viewTimerId = null;
+    let answerTimerId = null;
+    let skipCount = 0;
+
     const BOARD_SIZE = 19;
     let CANVAS_SIZE, STONE_RADIUS, MARGIN, BASE_SPAN, CELL_SIZE;
     const TOTAL_QUESTIONS = 10;
 
-    // 天梯模式預設位置
     const ladderPositions = [
-      [0, 0],
-      [0, 9],
-      [0, 18],
-      [9, 18],
-      [18, 18],
-      [18, 9],
-      [18, 0],
-      [9, 0],
-      [9, 9],
-      [9, 9],
-      [9, 9],
-      [9, 9]
+      [0, 0], [0, 9], [0, 18], [9, 18],
+      [18, 18], [18, 9], [18, 0], [9, 0],
+      [9, 9], [9, 9], [9, 9], [9, 9]
     ];
 
-    // 時間扣分倍率對照表
     const TIME_MULTIPLIERS = {
-      1: 1.00,
-      2: 0.46,  // 減少 54%
-      3: 0.38,  // 減少 62%
-      4: 0.31,  // 減少 69%
-      5: 0.25,  // 減少 75%
-      6: 0.20,  // 減少 80%
-      7: 0.16,  // 減少 84%
-      8: 0.13,  // 減少 87%
-      9: 0.11,  // 減少 89%
-      10: 0.10  // 減少 90%
+      1: 1.00, 2: 0.46, 3: 0.38, 4: 0.31, 5: 0.25,
+      6: 0.20, 7: 0.16, 8: 0.13, 9: 0.11, 10: 0.10
     };
 
+    const IRREGULAR_CONFIG = {
+      initial: 3, 
+      deltaMultiplier: 0.5,
+      mistakeLimit: 5
+    };
     function resizeCanvas() {
       const wrapper = document.getElementById('board-wrapper');
       const rect = wrapper.getBoundingClientRect();
@@ -432,99 +208,117 @@
       if (currentStones.length) drawStones(currentStones);
     }
 
-    difficultySl.addEventListener("input", () => {
-      sliderValueSp.textContent = difficultySl.value;
-    });
-
-    // 監聽「限時滑桿」，即時更新顯示與 timeLimit
-    timeSl.addEventListener("input", () => {
-      timeValueSp.textContent = timeSl.value;
-      timeLimit = parseInt(timeSl.value, 10);
-    });
+    difficultySl.addEventListener("input", () => sliderValueSp.textContent = difficultySl.value);
+    timeSl.addEventListener("input", () => { timeValueSp.textContent = timeSl.value; timeLimit = parseInt(timeSl.value, 10); });
 
     function drawEmptyBoard() {
       ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
       ctx.strokeStyle = "#2c3e50";
-      ctx.lineWidth = 1;
-      for (let i = 0; i < BOARD_SIZE; i++) {
+      ctx.lineWidth = 2;
+      if (mode === "irregular") {
         ctx.beginPath();
-        ctx.moveTo(MARGIN, MARGIN + i * CELL_SIZE);
-        ctx.lineTo(CANVAS_SIZE - MARGIN, MARGIN + i * CELL_SIZE);
+        ctx.rect(MARGIN - 1, MARGIN - 1, CANVAS_SIZE - 2 * MARGIN + 2, CANVAS_SIZE - 2 * MARGIN + 2);
         ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(MARGIN + i * CELL_SIZE, MARGIN);
-        ctx.lineTo(MARGIN + i * CELL_SIZE, CANVAS_SIZE - MARGIN);
-        ctx.stroke();
+      } else {
+        ctx.lineWidth = 1;
+        for (let i = 0; i < BOARD_SIZE; i++) {
+          ctx.beginPath();
+          ctx.moveTo(MARGIN, MARGIN + i * CELL_SIZE);
+          ctx.lineTo(CANVAS_SIZE - MARGIN, MARGIN + i * CELL_SIZE);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(MARGIN + i * CELL_SIZE, MARGIN);
+          ctx.lineTo(MARGIN + i * CELL_SIZE, CANVAS_SIZE - MARGIN);
+          ctx.stroke();
+        }
       }
     }
 
     function drawStones(stones) {
-      ctx.fillStyle = "#000";
-      stones.forEach(([x, y]) => {
-        const px = MARGIN + x * CELL_SIZE;
-        const py = MARGIN + y * CELL_SIZE;
+      stones.forEach(s => {
+        let px, py;
+        if (s.pixel) {
+          px = s.px; py = s.py;
+        } else {
+          px = MARGIN + s.gx * CELL_SIZE;
+          py = MARGIN + s.gy * CELL_SIZE;
+        }
+        ctx.fillStyle = "#000";
         ctx.beginPath();
         ctx.arc(px, py, STONE_RADIUS, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "rgba(255,255,255,0.08)";
+        ctx.beginPath();
+        ctx.arc(px - STONE_RADIUS * 0.25, py - STONE_RADIUS * 0.25, STONE_RADIUS * 0.35, 0, Math.PI * 2);
         ctx.fill();
       });
     }
 
-    function randInt(min, max) {
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
+    function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+    function generateStonesByCount(modeLocal, count) {
+      if (modeLocal === "irregular") {
+        const stones = [];
+        const minX = MARGIN + STONE_RADIUS;
+        const minY = MARGIN + STONE_RADIUS;
+        const maxX = CANVAS_SIZE - MARGIN - STONE_RADIUS;
+        const maxY = CANVAS_SIZE - MARGIN - STONE_RADIUS;
+        const maxAttempts = Math.max(2000, count * 200);
+        let attempts = 0;
+        while (stones.length < count && attempts < maxAttempts) {
+          attempts++;
+          const px = Math.random() * (maxX - minX) + minX;
+          const py = Math.random() * (maxY - minY) + minY;
+          let ok = true;
+          for (const s of stones) {
+            const dx = s.px - px, dy = s.py - py;
+            const dist2 = dx * dx + dy * dy;
+            const minDist = (STONE_RADIUS * 2) * 0.95;
+            if (dist2 < (minDist * minDist)) { ok = false; break; }
+          }
+          if (ok) stones.push({ px, py, pixel: true });
+        }
+        return stones;
+      }
 
-    function generateStonesByCount(mode, count) {
-      const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+      const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
       let x0, y0;
-
-      if (mode === "corner") {
-        x0 = 0; y0 = 0;
-      }
-      else if (mode === "edge") {
-        x0 = 0; y0 = 9;
-      }
-      else if (mode === "center") {
-        x0 = 9; y0 = 9;
-      }
-      else if (mode === "ladder") {
+      if (modeLocal === "corner") { x0 = 0; y0 = 0; }
+      else if (modeLocal === "edge") { x0 = 0; y0 = 9; }
+      else if (modeLocal === "center") { x0 = 9; y0 = 9; }
+      else if (modeLocal === "ladder") {
         const idx = (questionCount - 1) % ladderPositions.length;
         [x0, y0] = ladderPositions[idx];
       } else {
-        const corners = [[0, 0], [0, BOARD_SIZE - 1], [BOARD_SIZE - 1, 0], [BOARD_SIZE - 1, BOARD_SIZE - 1]];
-        const [cx, cy] = corners[randInt(0, 3)];
-        x0 = cx + randInt(0, 4) * (cx === 0 ? 1 : -1);
-        y0 = cy + randInt(0, 4) * (cy === 0 ? 1 : -1);
+        const corners = [[0,0],[0,BOARD_SIZE-1],[BOARD_SIZE-1,0],[BOARD_SIZE-1,BOARD_SIZE-1]];
+        const [cx, cy] = corners[randInt(0,3)];
+        x0 = cx + randInt(0,4) * (cx === 0 ? 1 : -1);
+        y0 = cy + randInt(0,4) * (cy === 0 ? 1 : -1);
         x0 = Math.max(0, Math.min(BOARD_SIZE - 1, x0));
         y0 = Math.max(0, Math.min(BOARD_SIZE - 1, y0));
       }
 
-      const stones = [[x0, y0]];
+      const stones = [{ gx: x0, gy: y0 }];
       const occupied = new Set([`${x0},${y0}`]);
       if (count === 1) return stones;
 
       for (let i = 1; i < count; i++) {
         const idx = randInt(0, stones.length - 1);
-        const [px, py] = stones[idx];
+        const [px, py] = [stones[idx].gx, stones[idx].gy];
         const shuffled = dirs.slice().sort(() => Math.random() - 0.5);
         let placed = false;
         for (const [dx, dy] of shuffled) {
           const nx = px + dx, ny = py + dy;
           const key = `${nx},${ny}`;
           if (nx >= 0 && nx < BOARD_SIZE && ny >= 0 && ny < BOARD_SIZE && !occupied.has(key)) {
-            stones.push([nx, ny]);
+            stones.push({ gx: nx, gy: ny });
             occupied.add(key);
-            placed = true;
-            break;
+            placed = true; break;
           }
         }
-        if (!placed) {
-          i--;
-          if (stones.length >= BOARD_SIZE * BOARD_SIZE) break;
-        }
+        if (!placed) { i--; if (stones.length >= BOARD_SIZE * BOARD_SIZE) break; }
       }
       return stones;
     }
-
     const CORRECT_DELTAS = [
       { delta: -2, prob: 0.10 }, { delta: -1, prob: 0.10 }, { delta: 0, prob: 0.125 },
       { delta: 1, prob: 0.15 }, { delta: 2, prob: 0.15 }, { delta: 3, prob: 0.125 },
@@ -539,16 +333,14 @@
     function sampleDelta(dist) {
       const p = Math.random();
       let cum = 0;
-      for (const e of dist) {
-        cum += e.prob;
-        if (p < cum) return e.delta;
-      }
+      for (const e of dist) { cum += e.prob; if (p < cum) return e.delta; }
       return dist[dist.length - 1].delta;
     }
-
-    function computeNextCount(prev, wasCorrect) {
-      const delta = wasCorrect ? sampleDelta(CORRECT_DELTAS) : sampleDelta(INCORRECT_DELTAS);
-      return Math.max(1, prev + delta);
+    function computeNextCount(prev, wasCorrect, multiplier = 1.0) {
+      const rawDelta = wasCorrect ? sampleDelta(CORRECT_DELTAS) : sampleDelta(INCORRECT_DELTAS);
+      const scaledDelta = Math.round(rawDelta * multiplier);
+      const next = Math.max(1, prev + scaledDelta);
+      return next;
     }
 
     function generateWeightedChoices(baseCount, distArray) {
@@ -557,43 +349,49 @@
         const cand = baseCount + e.delta;
         if (cand >= 1) arr.push(cand);
       });
-      return arr;
+      return Array.from(new Set(arr)).sort((a,b)=>a-b);
+    }
+
+    function clearTimers() {
+      if (viewTimerId) { clearInterval(viewTimerId); viewTimerId = null; }
+      if (answerTimerId) { clearInterval(answerTimerId); answerTimerId = null; }
+      timerDiv.style.display = "none";
     }
 
     function nextQuestion() {
+      clearTimers();
+
       feedbackDiv.textContent = `準備第 ${questionCount + 1} 題...`;
       choicesDiv.innerHTML = "";
-      timerDiv.style.display = "none";
 
       questionCount++;
-      if (mode === "ladder") {
+      if (mode === "ladder" || mode === "irregular") {
         if (questionCount === 1) {
-          currentCount = computeNextCount(5, true);
+          if (mode === "irregular") {
+            currentCount = IRREGULAR_CONFIG.initial;
+          } else {
+            currentCount = computeNextCount(5, true);
+          }
         }
       } else {
         if (questionCount === 1) {
           currentCount = 1 + randInt(1, 3) + (difficulty - 1) * 10;
         }
-        if (questionCount > TOTAL_QUESTIONS) {
-          showSummary();
-          return;
-        }
+        if (questionCount > TOTAL_QUESTIONS) { showSummary(); return; }
       }
 
       drawEmptyBoard();
       currentStones = generateStonesByCount(mode, currentCount);
       correctNumber = currentStones.length;
       drawStones(currentStones);
-
-      // 顯示計時器，並使用動態 timeLimit
       timerDiv.style.display = "block";
       timerDiv.textContent = timeLimit.toFixed(1) + "秒";
-      let timeLeft = timeLimit;
-      const tm = setInterval(() => {
-        timeLeft -= 0.1;
-        timerDiv.textContent = timeLeft.toFixed(1) + "秒";
-        if (timeLeft <= 0) {
-          clearInterval(tm);
+      let viewLeft = timeLimit;
+      viewTimerId = setInterval(() => {
+        viewLeft -= 0.1;
+        timerDiv.textContent = viewLeft.toFixed(1) + "秒";
+        if (viewLeft <= 0) {
+          clearInterval(viewTimerId); viewTimerId = null;
           timerDiv.style.display = "none";
           drawEmptyBoard();
           showChoices();
@@ -604,7 +402,11 @@
 
     function showChoices() {
       const base = prevCorrectNumber !== null ? prevCorrectNumber : correctNumber;
-      const dist = prevCorrectNumber !== null ? (prevWasCorrect ? CORRECT_DELTAS : INCORRECT_DELTAS) : CORRECT_DELTAS;
+      let dist;
+      if (prevCorrectNumber === null) dist = CORRECT_DELTAS;
+      else if (prevWasCorrect === null) dist = CORRECT_DELTAS;
+      else dist = prevWasCorrect ? CORRECT_DELTAS : INCORRECT_DELTAS;
+
       const opts = generateWeightedChoices(base, dist);
       choicesDiv.innerHTML = "";
       opts.forEach(n => {
@@ -614,17 +416,47 @@
         btn.onclick = () => handleAnswer(n);
         choicesDiv.appendChild(btn);
       });
+      timerDiv.style.display = "block";
+      let ansLeft = 2.0;
+      timerDiv.textContent = "答題：" + ansLeft.toFixed(1) + "秒";
+      answerTimerId = setInterval(() => {
+        ansLeft -= 0.05;
+        timerDiv.textContent = "答題：" + Math.max(0, ansLeft).toFixed(1) + "秒";
+        if (ansLeft <= 0) {
+          clearInterval(answerTimerId); answerTimerId = null;
+          timerDiv.style.display = "none";
+          handleSkip();
+        }
+      }, 50);
+    }
+
+    function handleSkip() {
+      Array.from(choicesDiv.children).forEach(b => b.disabled = true);
+      skipCount++;
+      prevCorrectNumber = correctNumber;
+      prevWasCorrect = null;
+      history.push({ answer: correctNumber, userAns: null, isCorrect: false, skipped: true, distance: null, count: currentCount });
+      Array.from(choicesDiv.children).forEach(b => {
+        const val = parseInt(b.textContent);
+        if (val === correctNumber) b.classList.add("correct");
+      });
+
+      feedbackDiv.textContent = `第 ${questionCount} 題：已跳過（正確答案：${correctNumber}）。此題 -1 分。`;
+      feedbackDiv.style.color = "#e67e22";
+      setTimeout(nextQuestion, 1200);
     }
 
     function handleAnswer(userAns) {
+      if (answerTimerId) { clearInterval(answerTimerId); answerTimerId = null; timerDiv.style.display = "none"; }
       Array.from(choicesDiv.children).forEach(b => b.disabled = true);
       const isCorrect = userAns === correctNumber;
       prevCorrectNumber = correctNumber;
       prevWasCorrect = isCorrect;
+
       Array.from(choicesDiv.children).forEach(b => {
         const val = parseInt(b.textContent);
         if (val === correctNumber) b.classList.add("correct");
-        else if (val === userAns) b.classList.add("incorrect");
+        else if (val === userAns) b.classList.add(isCorrect ? "correct" : "incorrect");
       });
 
       feedbackDiv.textContent = isCorrect ?
@@ -633,16 +465,23 @@
       feedbackDiv.style.color = isCorrect ? "#27ae60" : "#e74c3c";
 
       const distance = Math.abs(userAns - correctNumber);
-      history.push({ answer: correctNumber, userAns, isCorrect, distance, count: currentCount });
-      if (mode === "ladder") {
-        if (!isCorrect) {
-          mistakeCount++;
-        }
-        if (mistakeCount >= 3) {
+      history.push({ answer: correctNumber, userAns, isCorrect, skipped: false, distance, count: currentCount });
+
+      if (!isCorrect) {
+        mistakeCount++;
+      }
+
+      if (mode === "ladder" || mode === "irregular") {
+        const limit = (mode === "irregular") ? IRREGULAR_CONFIG.mistakeLimit : 3;
+        if (mistakeCount >= limit) {
           setTimeout(showSummary, 1000);
           return;
         }
-        currentCount = computeNextCount(currentCount, isCorrect);
+        if (mode === "irregular") {
+          currentCount = computeNextCount(currentCount, isCorrect, IRREGULAR_CONFIG.deltaMultiplier);
+        } else {
+          currentCount = computeNextCount(currentCount, isCorrect);
+        }
         setTimeout(nextQuestion, 1500);
       } else {
         currentCount = computeNextCount(currentCount, isCorrect);
@@ -654,54 +493,33 @@
       quizDiv.style.display = "none";
       summaryDiv.style.display = "block";
 
-      const totalQuestions = history.length;
-      const correctEntries = history.filter(h => h.isCorrect);
-      const wrongEntries = history.filter(h => !h.isCorrect);
+      const allNonSkipped = history.filter(h => !h.skipped);
+      const totalAnswered = allNonSkipped.length;
+      const correctEntries = allNonSkipped.filter(h => h.isCorrect);
+      const wrongEntries = allNonSkipped.filter(h => !h.isCorrect);
+
       const sumCorrectCounts = correctEntries.reduce((sum, h) => sum + h.count, 0);
       const sumWrongCounts = wrongEntries.reduce((sum, h) => sum + h.count, 0);
-      const cumulativeError = history.reduce((sum, h) => sum + h.distance * h.distance, 0);
-      const hitRate = correctEntries.length / totalQuestions;
-      const baseFactor = (sumCorrectCounts + sumWrongCounts / 2) / totalQuestions;
+      const cumulativeError = allNonSkipped.reduce((sum, h) => sum + (h.distance ? h.distance * h.distance : 0), 0);
+      const hitRate = totalAnswered > 0 ? correctEntries.length / totalAnswered : 0;
+      const baseFactor = totalAnswered > 0 ? (sumCorrectCounts + sumWrongCounts / 2) / totalAnswered : 0;
       let adjustedRate = hitRate * 100 - cumulativeError;
       if (adjustedRate < 0) adjustedRate = 0;
 
-      let medianCorrectCount = 0;
-      if (correctEntries.length > 0) {
-        const counts = correctEntries.map(h => h.count).sort((a, b) => a - b);
-        const mid = Math.floor(counts.length / 2);
-        medianCorrectCount = (counts.length % 2 === 1)
-          ? counts[mid]
-          : (counts[mid - 1] + counts[mid]) / 2;
-      }
+      // Removed medianBonus and related selection entirely
+      let rawScore = (baseFactor * adjustedRate) / 50;
+      const rawScoreAfterTime = rawScore * TIME_MULTIPLIERS[timeLimit];
 
-      let medianBonus = 0;
-      if (hitRate >= 0.6) {
-        medianBonus = (medianCorrectCount * hitRate) / 2;
-      }
-      let finalScore = (baseFactor * adjustedRate) / 100 + medianBonus;
-
-      // 根據 timeLimit 套用扣分倍率
-      finalScore *= TIME_MULTIPLIERS[timeLimit];
-
-      const h2 = summaryDiv.querySelector("h2");
-      if (h2) h2.style.display = "none";
+      const finalScore = Math.max(0, rawScoreAfterTime - skipCount);
 
       let modeDisplay = "";
       switch (mode) {
-        case "corner":
-          modeDisplay = "測試模式‧角上";
-          break;
-        case "edge":
-          modeDisplay = "測試模式‧邊上";
-          break;
-        case "center":
-          modeDisplay = "測試模式‧中央";
-          break;
-        case "ladder":
-          modeDisplay = "天梯模式";
-          break;
-        default:
-          modeDisplay = "";
+        case "corner": modeDisplay = "測試模式‧角上"; break;
+        case "edge": modeDisplay = "測試模式‧邊上"; break;
+        case "center": modeDisplay = "測試模式‧中央"; break;
+        case "ladder": modeDisplay = "天梯模式"; break;
+        case "irregular": modeDisplay = "不規則天梯"; break;
+        default: modeDisplay = "";
       }
 
       scoreOverview.innerHTML = `
@@ -710,36 +528,53 @@
         <h3>最終分數：${finalScore.toFixed(2)}</h3>
       `;
 
+      const formulaText = [];
+      formulaText.push(`計算步驟：`);
+      formulaText.push(`1) totalAnswered = ${totalAnswered}（排除跳過）`);
+      formulaText.push(`2) correct = ${correctEntries.length}, wrong = ${wrongEntries.length}, skip = ${skipCount}`);
+      formulaText.push(`3) sumCorrectCounts = ${sumCorrectCounts}, sumWrongCounts = ${sumWrongCounts}`);
+      formulaText.push(`4) cumulativeError = ${cumulativeError.toFixed(3)}`);
+      formulaText.push(`5) hitRate = ${hitRate.toFixed(4)} => ${ (hitRate*100).toFixed(2) }%`);
+      formulaText.push(`6) baseFactor = (${sumCorrectCounts} + ${sumWrongCounts} / 2) / ${ totalAnswered > 0 ? totalAnswered : 1 } = ${ baseFactor.toFixed(4) }`);
+      formulaText.push(`7) adjustedRate = hitRate*100 - cumulativeError = ${ (hitRate*100).toFixed(4) } - ${ cumulativeError.toFixed(4) } = ${ adjustedRate.toFixed(4) }`);
+      formulaText.push(`8) rawScore = (baseFactor * adjustedRate) / 50 = (${ baseFactor.toFixed(4) } * ${ adjustedRate.toFixed(4) })/ 50 = ${ rawScore.toFixed(4) }`);
+      formulaText.push(`9) time multiplier (timeLimit=${timeLimit}) = ${ TIME_MULTIPLIERS[timeLimit] } (乘上)`);
+      formulaText.push(`10) rawScore after time multiplier = ${ (rawScoreAfterTime).toFixed(4) }`);
+      formulaText.push(`11) skip penalty = ${skipCount} * 1 = ${skipCount}`);
+      formulaText.push(`12) finalScore = max(0, rawScore_after_multiplier - skipPenalty) = max(0, ${ rawScoreAfterTime.toFixed(4) } - ${ skipCount }) = ${ finalScore.toFixed(4) }`);
+
+      scoreFormulaDiv.textContent = formulaText.join('\n');
+
       scoreBody.innerHTML = "";
       history.forEach((h, i) => {
         const tr = document.createElement("tr");
+        const userAnsDisplay = h.skipped ? '跳過' : (h.userAns === null ? '-' : h.userAns);
+        const isCorrectDisplay = h.skipped ? '跳過' : (h.isCorrect ? '✔️' : '❌');
+        const distanceDisplay = h.skipped ? '-' : (h.distance === null ? '-' : h.distance);
         tr.innerHTML = `
           <td>${i + 1}</td>
           <td>${h.answer}</td>
-          <td>${h.userAns}</td>
-          <td>${h.isCorrect ? '✔️' : '❌'}</td>
-          <td>${h.distance}</td>
+          <td>${userAnsDisplay}</td>
+          <td>${isCorrectDisplay}</td>
+          <td>${distanceDisplay}</td>
         `;
-        tr.classList.add(h.isCorrect ? "correct-row" : "incorrect-row");
+        if (h.skipped) {
+        } else if (h.isCorrect) {
+          tr.classList.add("correct-row");
+        } else {
+          tr.classList.add("incorrect-row");
+        }
         scoreBody.appendChild(tr);
       });
     }
 
-    // 重新開始按鈕
     restartBtn.onclick = () => {
-      questionCount = 0;
-      history = [];
-      currentCount = 0;
-      prevCorrectNumber = null;
-      prevWasCorrect = null;
-      mistakeCount = 0;
-      summaryDiv.style.display = "none";
-      feedbackDiv.textContent = "";
-      feedbackDiv.style.color = "";
+      questionCount = 0; history = []; currentCount = 0; prevCorrectNumber = null;
+      prevWasCorrect = null; mistakeCount = 0; summaryDiv.style.display = "none"; skipCount = 0;
+      feedbackDiv.textContent = ""; feedbackDiv.style.color = "";
       homeDiv.style.display = "flex";
     };
 
-    // 截圖按鈕 (複製影像到剪貼簿)
     screenshotBtn.onclick = async () => {
       const h1Elem = document.querySelector("h1");
       const summaryElem = document.getElementById("summary");
@@ -766,9 +601,7 @@
             return;
           }
           try {
-            await navigator.clipboard.write([
-              new ClipboardItem({ "image/png": blob })
-            ]);
+            await navigator.clipboard.write([ new ClipboardItem({ "image/png": blob }) ]);
           } catch (err) {
             alert("複製失敗: " + err);
           }
@@ -780,18 +613,13 @@
       }
     };
 
-    // 點擊模式按鈕：進入對應模式
     homeDiv.addEventListener("click", e => {
       if (e.target.tagName === "BUTTON") {
         mode = e.target.getAttribute("data-mode");
         difficulty = parseInt(difficultySl.value, 10);
-        // timeLimit 由滑桿設定，已經在 input 事件更新
-        questionCount = 0;
-        history = [];
-        currentCount = 0;
-        prevCorrectNumber = null;
-        prevWasCorrect = null;
-        mistakeCount = 0;
+        timeLimit = parseInt(timeSl.value, 10);
+        questionCount = 0; history = []; currentCount = 0; prevCorrectNumber = null;
+        prevWasCorrect = null; mistakeCount = 0; skipCount = 0;
         homeDiv.style.display = "none";
         quizDiv.style.display = "flex";
         summaryDiv.style.display = "none";
