@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>One-second observation test (v2)</title>
+  <title>One-second observation test (v3)</title>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -128,6 +128,7 @@
           <th>題號</th>
           <th>正確答案</th>
           <th>使用者答案</th>
+          <th>作答時間 (s)</th>
           <th>是否答對</th>
           <th>誤差距離</th>
         </tr>
@@ -177,6 +178,9 @@
     const BOARD_SIZE = 19;
     let CANVAS_SIZE, STONE_RADIUS, MARGIN, BASE_SPAN, CELL_SIZE;
     const TOTAL_QUESTIONS = 10;
+
+    // New: track when the choices were shown so we can measure response time
+    let currentQuestionStartTime = null;
 
     const ladderPositions = [
       [0, 0], [0, 9], [0, 18], [9, 18],
@@ -416,6 +420,10 @@
         btn.onclick = () => handleAnswer(n);
         choicesDiv.appendChild(btn);
       });
+
+      // Start timing for this question (user response time measurement)
+      currentQuestionStartTime = performance.now();
+
       timerDiv.style.display = "block";
       let ansLeft = 2.0;
       timerDiv.textContent = "答題：" + ansLeft.toFixed(1) + "秒";
@@ -435,7 +443,16 @@
       skipCount++;
       prevCorrectNumber = correctNumber;
       prevWasCorrect = null;
-      history.push({ answer: correctNumber, userAns: null, isCorrect: false, skipped: true, distance: null, count: currentCount });
+
+      // Compute actual response time until timeout (in seconds)
+      let responseTime = 2.0;
+      if (currentQuestionStartTime !== null) {
+        responseTime = (performance.now() - currentQuestionStartTime) / 1000;
+        if (responseTime < 0) responseTime = 0;
+        if (responseTime > 2.0) responseTime = 2.0;
+      }
+
+      history.push({ answer: correctNumber, userAns: null, isCorrect: false, skipped: true, distance: null, count: currentCount, responseTime });
       Array.from(choicesDiv.children).forEach(b => {
         const val = parseInt(b.textContent);
         if (val === correctNumber) b.classList.add("correct");
@@ -465,7 +482,15 @@
       feedbackDiv.style.color = isCorrect ? "#27ae60" : "#e74c3c";
 
       const distance = Math.abs(userAns - correctNumber);
-      history.push({ answer: correctNumber, userAns, isCorrect, skipped: false, distance, count: currentCount });
+
+      // Record response time (in seconds)
+      let responseTime = 0;
+      if (currentQuestionStartTime !== null) {
+        responseTime = (performance.now() - currentQuestionStartTime) / 1000;
+        if (responseTime < 0) responseTime = 0;
+      }
+
+      history.push({ answer: correctNumber, userAns, isCorrect, skipped: false, distance, count: currentCount, responseTime });
 
       if (!isCorrect) {
         mistakeCount++;
@@ -487,6 +512,14 @@
         currentCount = computeNextCount(currentCount, isCorrect);
         setTimeout(nextQuestion, 1500);
       }
+    }
+
+    // Convert time (sec) to color: 0 -> red (#ff0000), 2 -> black (#000000)
+    function timeToColor(sec) {
+      const clamped = Math.max(0, Math.min(2, sec));
+      const norm = clamped / 2; // 0..1
+      const r = Math.round(255 * (1 - norm));
+      return `rgb(${r},0,0)`; // interpolates red -> black
     }
 
     function showSummary() {
@@ -551,13 +584,24 @@
         const userAnsDisplay = h.skipped ? '跳過' : (h.userAns === null ? '-' : h.userAns);
         const isCorrectDisplay = h.skipped ? '跳過' : (h.isCorrect ? '✔️' : '❌');
         const distanceDisplay = h.skipped ? '-' : (h.distance === null ? '-' : h.distance);
+        const rt = (typeof h.responseTime === 'number') ? h.responseTime : null;
+        const rtDisplay = rt === null ? '-' : `${rt.toFixed(3)}s`;
+
         tr.innerHTML = `
           <td>${i + 1}</td>
           <td>${h.answer}</td>
           <td>${userAnsDisplay}</td>
+          <td class="time-cell">${rtDisplay}</td>
           <td>${isCorrectDisplay}</td>
           <td>${distanceDisplay}</td>
         `;
+
+        // Colorize the time cell based on response time (0s -> red, 2s -> black)
+        if (rt !== null) {
+          const timeCell = tr.querySelector('.time-cell');
+          if (timeCell) timeCell.style.color = timeToColor(rt);
+        }
+
         if (h.skipped) {
         } else if (h.isCorrect) {
           tr.classList.add("correct-row");
