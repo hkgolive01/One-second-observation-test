@@ -412,6 +412,7 @@
       initial: 3,
       mistakeLimit: 5
     };
+
     function resizeCanvas() {
       const wrapper = document.getElementById('board-wrapper');
       const rect = wrapper.getBoundingClientRect();
@@ -537,15 +538,24 @@
       }
       return stones;
     }
+
     const CORRECT_DELTAS = [
       { delta: -2, prob: 0.10 }, { delta: -1, prob: 0.10 }, { delta: 0, prob: 0.125 },
       { delta: 1, prob: 0.15 }, { delta: 2, prob: 0.15 }, { delta: 3, prob: 0.125 },
       { delta: 4, prob: 0.125 }, { delta: 5, prob: 0.125 }
     ];
+
+    // 新增：不規則天梯答對時要用的分布（你提供的那組）
+    const IRREGULAR_CORRECT_DELTAS = [
+      { delta: -3, prob: 0.12 }, { delta: -2, prob: 0.12 }, { delta: -1, prob: 0.125 },
+      { delta: 0, prob: 0.125 },  { delta: 1, prob: 0.13 },  { delta: 2, prob: 0.13 },
+      { delta: 3, prob: 0.125 },  { delta: 4, prob: 0.125 }
+    ];
+
     const INCORRECT_DELTAS = [
       { delta: -3, prob: 0.15 }, { delta: -2, prob: 0.15 }, { delta: -1, prob: 0.15 },
-      { delta: 0, prob: 0.15 }, { delta: 1, prob: 0.15 }, { delta: 2, prob: 0.125 },
-      { delta: 3, prob: 0.125 }, { delta: 4, prob: 0.05 }
+      { delta: 0, prob: 0.15 }, { delta: 1, prob: 0.125 }, { delta: 2, prob: 0.125 },
+      { delta: 3, prob: 0.1 }, { delta: 4, prob: 0.05 }
     ];
 
     function sampleDelta(dist) {
@@ -554,8 +564,16 @@
       for (const e of dist) { cum += e.prob; if (p < cum) return e.delta; }
       return dist[dist.length - 1].delta;
     }
+
+    // 修改：computeNextCount 會根據 mode 與 wasCorrect 決定要抽哪個分布
     function computeNextCount(prev, wasCorrect, multiplier = 1.0) {
-      const rawDelta = wasCorrect ? sampleDelta(CORRECT_DELTAS) : sampleDelta(INCORRECT_DELTAS);
+      let dist;
+      if (wasCorrect) {
+        dist = (mode === "irregular") ? IRREGULAR_CORRECT_DELTAS : CORRECT_DELTAS;
+      } else {
+        dist = INCORRECT_DELTAS;
+      }
+      const rawDelta = sampleDelta(dist);
       const scaledDelta = Math.round(rawDelta * multiplier);
       const next = Math.max(1, prev + scaledDelta);
       return next;
@@ -579,7 +597,7 @@
     function nextQuestion() {
       clearTimers();
 
-      feedbackDiv.textContent = `準備第 ${questionCount + 1} 題...`;
+      feedbackDiv.textContent = `準備第 ${questionCount + 1} 題.`;
       choicesDiv.innerHTML = "";
 
       questionCount++;
@@ -623,7 +641,14 @@
       let dist;
       if (prevCorrectNumber === null) dist = CORRECT_DELTAS;
       else if (prevWasCorrect === null) dist = CORRECT_DELTAS;
-      else dist = prevWasCorrect ? CORRECT_DELTAS : INCORRECT_DELTAS;
+      else {
+        // 修改：如果上一題答對，且模式是不規則天梯，使用 IRREGULAR_CORRECT_DELTAS
+        if (prevWasCorrect) {
+          dist = (mode === "irregular") ? IRREGULAR_CORRECT_DELTAS : CORRECT_DELTAS;
+        } else {
+          dist = INCORRECT_DELTAS;
+        }
+      }
 
       const opts = generateWeightedChoices(base, dist);
       choicesDiv.innerHTML = "";
@@ -720,15 +745,19 @@
 
         setTimeout(nextQuestion, 1500);
       } else {
-        currentCount = computeNextCount(currentCount, isCorrect);
-        setTimeout(nextQuestion, 1500);
+        if (questionCount >= TOTAL_QUESTIONS) {
+          setTimeout(showSummary, 700);
+        } else {
+          currentCount = 1 + randInt(1, 3) + (difficulty - 1) * 10;
+          setTimeout(nextQuestion, 700);
+        }
       }
     }
 
     // Convert time (sec) to color: 0 -> red (#ff0000), 2 -> black (#000000)
     function timeToColor(sec) {
       const clamped = Math.max(0, Math.min(2, sec));
-      const norm = clamped / 2; // 0..1
+      const norm = clamped / 2; // 0.1
       const r = Math.round(255 * (1 - norm));
       return `rgb(${r},0,0)`; // interpolates red -> black
     }
