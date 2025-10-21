@@ -806,15 +806,15 @@
       formulaText.push(`1) totalAnswered = ${totalAnswered}（排除跳過）`);
       formulaText.push(`2) correct = ${correctEntries.length}, wrong = ${wrongEntries.length}, skip = ${skipCount}`);
       formulaText.push(`3) sumCorrectCounts = ${sumCorrectCounts}, sumWrongCounts = ${sumWrongCounts}`);
-      formulaText.push(`4) cumulativeError = ${cumulativeError.toFixed(3)}`);
-      formulaText.push(`5) hitRate = ${hitRate.toFixed(4)} => ${(hitRate * 100).toFixed(2)}%`);
-      formulaText.push(`6) baseFactor = (${sumCorrectCounts} + ${sumWrongCounts} / 2) / ${totalAnswered > 0 ? totalAnswered : 1} = ${baseFactor.toFixed(4)}`);
-      formulaText.push(`7) adjustedRate = hitRate*100 - cumulativeError = ${(hitRate * 100).toFixed(4)} - ${cumulativeError.toFixed(4)} = ${adjustedRate.toFixed(4)}`);
-      formulaText.push(`8) rawScore = (baseFactor * adjustedRate) / 50 = (${baseFactor.toFixed(4)} * ${adjustedRate.toFixed(4)})/ 50 = ${rawScore.toFixed(4)}`);
+      formulaText.push(`4) cumulativeError = ${cumulativeError.toFixed(2)}`);
+      formulaText.push(`5) hitRate = ${hitRate.toFixed(2)} => ${(hitRate * 100).toFixed(2)}%`);
+      formulaText.push(`6) baseFactor = (${sumCorrectCounts} + ${sumWrongCounts} / 2) / ${totalAnswered > 0 ? totalAnswered : 1} = ${baseFactor.toFixed(2)}`);
+      formulaText.push(`7) adjustedRate = hitRate*100 - cumulativeError = ${(hitRate * 100).toFixed(2)} - ${cumulativeError.toFixed(2)} = ${adjustedRate.toFixed(2)}`);
+      formulaText.push(`8) rawScore = (baseFactor * adjustedRate) / 50 = (${baseFactor.toFixed(2)} * ${adjustedRate.toFixed(2)})/ 50 = ${rawScore.toFixed(2)}`);
       formulaText.push(`9) time multiplier (timeLimit=${timeLimit}) = ${TIME_MULTIPLIERS[timeLimit]} (乘上)`);
-      formulaText.push(`10) rawScore after time multiplier = ${(rawScoreAfterTime).toFixed(4)}`);
+      formulaText.push(`10) rawScore after time multiplier = ${(rawScoreAfterTime).toFixed(2)}`);
       formulaText.push(`11) skip penalty = ${skipCount} * 1 = ${skipCount}`);
-      formulaText.push(`12) finalScore = max(0, rawScore_after_multiplier - skipPenalty) = max(0, ${rawScoreAfterTime.toFixed(4)} - ${skipCount}) = ${finalScore.toFixed(4)}`);
+      formulaText.push(`12) finalScore = max(0, rawScore_after_multiplier - skipPenalty) = max(0, ${rawScoreAfterTime.toFixed(2)} - ${skipCount})`);
 
       scoreFormulaDiv.textContent = formulaText.join('\n');
 
