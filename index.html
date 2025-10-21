@@ -409,7 +409,6 @@
     };
 
     const IRREGULAR_CONFIG = {
-      initial: 3,
       mistakeLimit: 5
     };
 
@@ -603,11 +602,7 @@
       questionCount++;
       if (mode === "ladder" || mode === "irregular") {
         if (questionCount === 1) {
-          if (mode === "irregular") {
-            currentCount = IRREGULAR_CONFIG.initial;
-          } else {
-            currentCount = computeNextCount(5, true);
-          }
+            currentCount = computeNextCount(4, true);
         }
       } else {
         if (questionCount === 1) {
