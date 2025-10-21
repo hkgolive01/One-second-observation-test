@@ -4,10 +4,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>One-second observation test (v3)</title>
+  <title>One-second observation test</title>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
       font-family: "Microsoft JhengHei", sans-serif;
       background-color: #f0f0f5;
@@ -18,65 +23,274 @@
       min-height: 100vh;
       padding: 20px;
     }
-    h1 { margin-bottom: 20px; font-size: 2.2rem; text-align: center; color: #2c3e50; }
-    button {
-      cursor: pointer; border: none; border-radius: 8px; padding: 12px 24px;
-      font-size: 1rem; transition: background-color 0.2s, transform 0.1s;
-      background-color: #2980b9; color: #fff;
+
+    h1 {
+      margin-bottom: 20px;
+      font-size: 2.2rem;
+      text-align: center;
+      color: #2c3e50;
     }
-    button:hover { transform: translateY(-2px); background-color: #1c5980; }
-    button:active { transform: translateY(0); }
-    button:disabled { background-color: #aaa; cursor: not-allowed; opacity: 0.7; }
+
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 24px;
+      font-size: 1rem;
+      transition: background-color 0.2s, transform 0.1s;
+      background-color: #2980b9;
+      color: #fff;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      background-color: #1c5980;
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      background-color: #aaa;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
 
     /* Container Layout */
-    #home { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 640px; gap: 16px; }
-    #home .slider-container { display:flex; align-items:center; width:100%; }
-    #home .slider-label { flex: 0 0 60px; font-size: 1rem; }
-    #home input[type="range"] { flex: 1; margin: 0 10px; }
-    #home .slider-value { width: 32px; text-align: center; font-weight: bold; }
+    #home {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 640px;
+      gap: 16px;
+    }
 
-    #home .mode-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
-    #home .mode-buttons button { background-color: #2980b9; color: #fff; font-size: 1.1rem; padding: 15px 10px; }
-    #home .mode-buttons button:hover { background-color: #1c5980; }
+    #home .slider-container {
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+
+    #home .slider-label {
+      flex: 0 0 60px;
+      font-size: 1rem;
+    }
+
+    #home input[type="range"] {
+      flex: 1;
+      margin: 0 10px;
+    }
+
+    #home .slider-value {
+      width: 32px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    #home .mode-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      width: 100%;
+    }
+
+    #home .mode-buttons button {
+      background-color: #2980b9;
+      color: #fff;
+      font-size: 1.1rem;
+      padding: 15px 10px;
+    }
+
+    #home .mode-buttons button:hover {
+      background-color: #1c5980;
+    }
 
     /* Quiz Container */
-    #quiz-container { display: none; flex-direction: column; align-items: center; width: 100%; max-width: 640px; }
-    #board-wrapper { position: relative; width: 100%; padding-top: 100%; }
-    #board { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 2px solid #2c3e50; background-color: #e0c78d; touch-action: none; }
+    #quiz-container {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 640px;
+    }
 
-    #feedback { font-size: 1.1rem; margin: 16px 0; color: #2c3e50; min-height: 1.5em; text-align: center; font-weight: bold; }
-    #choices { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:16px; width:100%; }
+    #board-wrapper {
+      position: relative;
+      width: 100%;
+      padding-top: 100%;
+    }
 
-    .choice-btn { flex: 1 1 calc(25% - 10px); min-width: 50px; background-color: #27ae60; color:#fff; min-height:60px; display:flex; align-items:center; justify-content:center; font-size:1.3rem; font-weight:bold; border-radius:8px; }
-    .choice-btn:hover { background-color:#1e8449; }
-    .choice-btn.correct { background-color:#27ae60; animation:pulse 0.5s; }
-    .choice-btn.incorrect { background-color:#e74c3c; }
+    #board {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 2px solid #2c3e50;
+      background-color: #e0c78d;
+      touch-action: none;
+    }
 
-    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+    #feedback {
+      font-size: 1.1rem;
+      margin: 16px 0;
+      color: #2c3e50;
+      min-height: 1.5em;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    #choices {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 16px;
+      width: 100%;
+    }
+
+    .choice-btn {
+      flex: 1 1 calc(25% - 10px);
+      min-width: 50px;
+      background-color: #27ae60;
+      color: #fff;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      font-weight: bold;
+      border-radius: 8px;
+    }
+
+    .choice-btn:hover {
+      background-color: #1e8449;
+    }
+
+    .choice-btn.correct {
+      background-color: #27ae60;
+      animation: pulse 0.5s;
+    }
+
+    .choice-btn.incorrect {
+      background-color: #e74c3c;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.1);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
 
     /* Summary */
-    #summary { display:none; width:100%; max-width:640px; text-align:center; margin-top:20px; }
-    #summary h2 { font-size:1.8rem; color:#2c3e50; margin-bottom:12px; }
-    #summary h3 { font-family:"Arial Black", Gadget, sans-serif; color:#e67e22; font-size:2.5rem; margin:16px 0; }
+    #summary {
+      display: none;
+      width: 100%;
+      max-width: 640px;
+      text-align: center;
+      margin-top: 20px;
+    }
 
-    #score-table { width:100%; border-collapse:collapse; margin-top:12px; font-size:0.95rem; }
-    #score-table th, #score-table td { border:1px solid #666; padding:8px; }
-    #score-table th { background-color:#bdc3c7; }
-    #score-table tr:nth-child(even){ background-color:#f2f2f2; }
-    #score-table tr.correct-row { background-color:#d4edda; }
-    #score-table tr.incorrect-row { background-color:#f8d7da; }
+    #summary h2 {
+      font-size: 1.8rem;
+      color: #2c3e50;
+      margin-bottom: 12px;
+    }
 
-    #restart, #screenshot { margin-top:20px; background-color:#c0392b; color:#fff; font-size:1rem; padding:12px 24px; }
-    #restart:hover, #screenshot:hover { background-color:#922b21; }
+    #summary h3 {
+      font-family: "Arial Black", Gadget, sans-serif;
+      color: #e67e22;
+      font-size: 2.5rem;
+      margin: 16px 0;
+    }
 
-    #timer { position:absolute; top:10px; right:10px; background: rgba(0,0,0,0.7); color:white; padding:5px 10px; border-radius:5px; font-size:1.2rem; display:none; }
+    #score-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 0.95rem;
+    }
+
+    #score-table th,
+    #score-table td {
+      border: 1px solid #666;
+      padding: 8px;
+    }
+
+    #score-table th {
+      background-color: #bdc3c7;
+    }
+
+    #score-table tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    #score-table tr.correct-row {
+      background-color: #d4edda;
+    }
+
+    #score-table tr.incorrect-row {
+      background-color: #f8d7da;
+    }
+
+    #restart,
+    #screenshot {
+      margin-top: 20px;
+      background-color: #c0392b;
+      color: #fff;
+      font-size: 1rem;
+      padding: 12px 24px;
+    }
+
+    #restart:hover,
+    #screenshot:hover {
+      background-color: #922b21;
+    }
+
+    #timer {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 1.2rem;
+      display: none;
+    }
 
     @media (max-width:600px) {
-      h1 { font-size:1.8rem; }
-      .choice-btn { flex: 1 1 calc(33% - 10px); min-height:50px; font-size:1.2rem; }
-      #home .mode-buttons { grid-template-columns: 1fr; }
-      #score-table { font-size:0.85rem; }
-      #summary h3 { font-size:2rem; }
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      .choice-btn {
+        flex: 1 1 calc(33% - 10px);
+        min-height: 50px;
+        font-size: 1.2rem;
+      }
+
+      #home .mode-buttons {
+        grid-template-columns: 1fr;
+      }
+
+      #score-table {
+        font-size: 0.85rem;
+      }
+
+      #summary h3 {
+        font-size: 2rem;
+      }
     }
   </style>
 </head>
@@ -121,7 +335,8 @@
   <div id="summary">
     <h2>測驗結束！</h2>
     <div id="score-overview"></div>
-    <div id="score-formula" style="text-align:left; margin-top:10px; font-family:monospace; white-space:pre-wrap;"></div>
+    <div id="score-formula" style="text-align:left; margin-top:10px; font-family:monospace; white-space:pre-wrap;">
+    </div>
     <table id="score-table">
       <thead>
         <tr>
@@ -194,8 +409,7 @@
     };
 
     const IRREGULAR_CONFIG = {
-      initial: 3, 
-      deltaMultiplier: 0.5,
+      initial: 3,
       mistakeLimit: 5
     };
     function resizeCanvas() {
@@ -284,7 +498,7 @@
         return stones;
       }
 
-      const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
+      const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
       let x0, y0;
       if (modeLocal === "corner") { x0 = 0; y0 = 0; }
       else if (modeLocal === "edge") { x0 = 0; y0 = 9; }
@@ -293,10 +507,10 @@
         const idx = (questionCount - 1) % ladderPositions.length;
         [x0, y0] = ladderPositions[idx];
       } else {
-        const corners = [[0,0],[0,BOARD_SIZE-1],[BOARD_SIZE-1,0],[BOARD_SIZE-1,BOARD_SIZE-1]];
-        const [cx, cy] = corners[randInt(0,3)];
-        x0 = cx + randInt(0,4) * (cx === 0 ? 1 : -1);
-        y0 = cy + randInt(0,4) * (cy === 0 ? 1 : -1);
+        const corners = [[0, 0], [0, BOARD_SIZE - 1], [BOARD_SIZE - 1, 0], [BOARD_SIZE - 1, BOARD_SIZE - 1]];
+        const [cx, cy] = corners[randInt(0, 3)];
+        x0 = cx + randInt(0, 4) * (cx === 0 ? 1 : -1);
+        y0 = cy + randInt(0, 4) * (cy === 0 ? 1 : -1);
         x0 = Math.max(0, Math.min(BOARD_SIZE - 1, x0));
         y0 = Math.max(0, Math.min(BOARD_SIZE - 1, y0));
       }
@@ -353,7 +567,7 @@
         const cand = baseCount + e.delta;
         if (cand >= 1) arr.push(cand);
       });
-      return Array.from(new Set(arr)).sort((a,b)=>a-b);
+      return Array.from(new Set(arr)).sort((a, b) => a - b);
     }
 
     function clearTimers() {
@@ -442,9 +656,8 @@
       Array.from(choicesDiv.children).forEach(b => b.disabled = true);
       skipCount++;
       prevCorrectNumber = correctNumber;
-      prevWasCorrect = null;
-
-      // Compute actual response time until timeout (in seconds)
+      prevWasCorrect = false;
+      currentCount = computeNextCount(currentCount,false);
       let responseTime = 2.0;
       if (currentQuestionStartTime !== null) {
         responseTime = (performance.now() - currentQuestionStartTime) / 1000;
@@ -502,11 +715,9 @@
           setTimeout(showSummary, 1000);
           return;
         }
-        if (mode === "irregular") {
-          currentCount = computeNextCount(currentCount, isCorrect, IRREGULAR_CONFIG.deltaMultiplier);
-        } else {
-          currentCount = computeNextCount(currentCount, isCorrect);
-        }
+
+        currentCount = computeNextCount(currentCount, isCorrect);
+
         setTimeout(nextQuestion, 1500);
       } else {
         currentCount = computeNextCount(currentCount, isCorrect);
@@ -567,14 +778,14 @@
       formulaText.push(`2) correct = ${correctEntries.length}, wrong = ${wrongEntries.length}, skip = ${skipCount}`);
       formulaText.push(`3) sumCorrectCounts = ${sumCorrectCounts}, sumWrongCounts = ${sumWrongCounts}`);
       formulaText.push(`4) cumulativeError = ${cumulativeError.toFixed(3)}`);
-      formulaText.push(`5) hitRate = ${hitRate.toFixed(4)} => ${ (hitRate*100).toFixed(2) }%`);
-      formulaText.push(`6) baseFactor = (${sumCorrectCounts} + ${sumWrongCounts} / 2) / ${ totalAnswered > 0 ? totalAnswered : 1 } = ${ baseFactor.toFixed(4) }`);
-      formulaText.push(`7) adjustedRate = hitRate*100 - cumulativeError = ${ (hitRate*100).toFixed(4) } - ${ cumulativeError.toFixed(4) } = ${ adjustedRate.toFixed(4) }`);
-      formulaText.push(`8) rawScore = (baseFactor * adjustedRate) / 50 = (${ baseFactor.toFixed(4) } * ${ adjustedRate.toFixed(4) })/ 50 = ${ rawScore.toFixed(4) }`);
-      formulaText.push(`9) time multiplier (timeLimit=${timeLimit}) = ${ TIME_MULTIPLIERS[timeLimit] } (乘上)`);
-      formulaText.push(`10) rawScore after time multiplier = ${ (rawScoreAfterTime).toFixed(4) }`);
+      formulaText.push(`5) hitRate = ${hitRate.toFixed(4)} => ${(hitRate * 100).toFixed(2)}%`);
+      formulaText.push(`6) baseFactor = (${sumCorrectCounts} + ${sumWrongCounts} / 2) / ${totalAnswered > 0 ? totalAnswered : 1} = ${baseFactor.toFixed(4)}`);
+      formulaText.push(`7) adjustedRate = hitRate*100 - cumulativeError = ${(hitRate * 100).toFixed(4)} - ${cumulativeError.toFixed(4)} = ${adjustedRate.toFixed(4)}`);
+      formulaText.push(`8) rawScore = (baseFactor * adjustedRate) / 50 = (${baseFactor.toFixed(4)} * ${adjustedRate.toFixed(4)})/ 50 = ${rawScore.toFixed(4)}`);
+      formulaText.push(`9) time multiplier (timeLimit=${timeLimit}) = ${TIME_MULTIPLIERS[timeLimit]} (乘上)`);
+      formulaText.push(`10) rawScore after time multiplier = ${(rawScoreAfterTime).toFixed(4)}`);
       formulaText.push(`11) skip penalty = ${skipCount} * 1 = ${skipCount}`);
-      formulaText.push(`12) finalScore = max(0, rawScore_after_multiplier - skipPenalty) = max(0, ${ rawScoreAfterTime.toFixed(4) } - ${ skipCount }) = ${ finalScore.toFixed(4) }`);
+      formulaText.push(`12) finalScore = max(0, rawScore_after_multiplier - skipPenalty) = max(0, ${rawScoreAfterTime.toFixed(4)} - ${skipCount}) = ${finalScore.toFixed(4)}`);
 
       scoreFormulaDiv.textContent = formulaText.join('\n');
 
@@ -645,7 +856,7 @@
             return;
           }
           try {
-            await navigator.clipboard.write([ new ClipboardItem({ "image/png": blob }) ]);
+            await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
           } catch (err) {
             alert("複製失敗: " + err);
           }
